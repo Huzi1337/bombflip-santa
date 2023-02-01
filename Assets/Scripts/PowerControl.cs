@@ -17,7 +17,6 @@ public class PowerControl : MonoBehaviour
     }
     void Update()
     {
-        Debug.Log(power);
         if(power < powerCap)
         {
             RechargePower(Time.deltaTime);
@@ -34,7 +33,6 @@ public class PowerControl : MonoBehaviour
             image.enabled = true;
             timer = 2f;
         }
-        Debug.Log(timer);
     }
     public void UsePower()
     {
