@@ -1,9 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using static UnityEngine.RuleTile.TilingRuleOutput;
-using UnityEngine.InputSystem.XR;
-using UnityEngine.InputSystem;
+
 
 public class PlayerDefaultState : PlayerBaseState
 {
@@ -26,6 +24,7 @@ public class PlayerDefaultState : PlayerBaseState
     {
         Rotate(stateMachine.InputHandler.RotateValue, deltaTime);
         MoveForward(deltaTime);
+        CapVelocity();
     }
 
     public override void Exit()
@@ -55,33 +54,46 @@ public class PlayerDefaultState : PlayerBaseState
     }
     private void Rotate(Vector2 rotateInput, float deltaTime)
     {
+
+        stateMachine.PlayerRigidbody.AddTorque(-rotateInput.x * stateMachine.rotateSpeed * deltaTime);
         
-            stateMachine.PlayerRigidbody.AddTorque(-rotateInput.x * stateMachine.rotateSpeed * deltaTime);
         
     }
 
     private void Flip()
     {
-        stateMachine.transform.localScale = new Vector2(stateMachine.transform.localScale.x, -stateMachine.transform.localScale.y);
-        stateMachine.PlayerRigidbody.velocity = new Vector2(-stateMachine.PlayerRigidbody.velocity.x, stateMachine.PlayerRigidbody.velocity.y);
+        stateMachine.transform.localScale = new Vector2(
+            stateMachine.transform.localScale.x,
+            -stateMachine.transform.localScale.y);
     }
 
     private void MoveForward(float deltaTime)
     {
-        stateMachine.PlayerRigidbody.velocity += new Vector2(stateMachine.transform.right.x, stateMachine.transform.right.y) * stateMachine.rideSpeed *deltaTime;
+        stateMachine.PlayerRigidbody.velocity +=
+            new Vector2(stateMachine.transform.right.x,
+            stateMachine.transform.right.y) * stateMachine.rideSpeed *deltaTime;
 
+    }
+
+    private void CapVelocity()
+    {
+        stateMachine.PlayerRigidbody.velocity = new Vector2(
+            Mathf.Min(Mathf.Abs(stateMachine.PlayerRigidbody.velocity.x), stateMachine.maxVelocity) * Mathf.Sign(stateMachine.PlayerRigidbody.velocity.x),
+            stateMachine.PlayerRigidbody.velocity.y);
     }
 
     private void TapJump ()
     {
+        if(stateMachine.PlayerRigidbody.IsTouchingLayers(LayerMask.GetMask("Ground")))
         stateMachine.PlayerRigidbody.AddForce(new Vector2(0, stateMachine.tapJumpSpeed), ForceMode2D.Impulse);
-        Debug.Log("Tap jump");
+        
     }
 
     private void Jump()
     {
-        stateMachine.PlayerRigidbody.AddForce(new Vector2(0, stateMachine.jumpSpeed), ForceMode2D.Impulse);
-        Debug.Log("Jump");
+        if (stateMachine.PlayerRigidbody.IsTouchingLayers(LayerMask.GetMask("Ground")))
+            stateMachine.PlayerRigidbody.AddForce(new Vector2(0, stateMachine.jumpSpeed), ForceMode2D.Impulse);
+        
     }
 
     private void Crouch ()
@@ -99,5 +111,7 @@ public class PlayerDefaultState : PlayerBaseState
         stateMachine.PlayerAnimator.SetBool("isDucking", false);
         Debug.Log("Stopping crouch");
     }
+
+
 
 }

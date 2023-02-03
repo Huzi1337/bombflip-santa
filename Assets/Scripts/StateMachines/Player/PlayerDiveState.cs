@@ -8,18 +8,19 @@ public class PlayerDiveState : PlayerBaseState
 
     public override void Enter()
     {
-        stateMachine.InputHandler.DiveDropEndEvent += DiveDropEnd;
+        
         Debug.Log("Entering dive state");
     }
 
     public override void Tick(float deltaTime)
     {
-        Debug.Log("Diving");
+       
+       if(stateMachine.PlayerRigidbody.IsTouchingLayers(LayerMask.GetMask("Ground"))) DiveDropEnd();
     }
 
     public override void Exit()
     {
-        stateMachine.InputHandler.DiveDropEndEvent -= DiveDropEnd;
+        
         Debug.Log("Exiting dive state");
     }
 

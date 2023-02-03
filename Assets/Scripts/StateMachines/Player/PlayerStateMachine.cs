@@ -10,6 +10,8 @@ public class PlayerStateMachine : StateMachine
     [SerializeField] public float rideSpeed = 10f;
     [SerializeField] public float jumpSpeed = 10f;
     [SerializeField] public float tapJumpSpeed = 5f;
+    [SerializeField] public float maxVelocity = 20f;
+    
 
     [field: SerializeField] public BoxCollider2D PlayerHitbox { get; set; }
     [field: SerializeField] public Collider2D DuckHitbox { get; set; }

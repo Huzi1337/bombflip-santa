@@ -5,7 +5,7 @@ using UnityEngine;
 public abstract class StateMachine : MonoBehaviour
 {
 
-    private State currentState;
+    public State currentState { get; private set; }
     // Start is called before the first frame update
     void Start()
     {
@@ -13,7 +13,7 @@ public abstract class StateMachine : MonoBehaviour
     }
 
     // Update is called once per frame
-    void Update()
+    void FixedUpdate()
     {
         currentState?.Tick(Time.deltaTime);
     }
@@ -21,6 +21,7 @@ public abstract class StateMachine : MonoBehaviour
     public void SwitchState(State newState)
     {
         currentState?.Exit();
+        Debug.Log(newState.GetType());
         currentState = newState;
         currentState?.Enter();
     }
