@@ -6,35 +6,41 @@ using UnityEngine;
 public class PlayerDefaultState : PlayerBaseState
 {
     public PlayerDefaultState(PlayerStateMachine stateMachine) : base(stateMachine) { }
-    
-
+    PlayerStats playerStats;
+    Rigidbody2D playerBody;
+    InputHandler EventEmitter;
     public override void Enter()
     {
-        stateMachine.InputHandler.DiveDropEvent += DiveDrop;
-        stateMachine.InputHandler.FlipEvent += Flip;
-        stateMachine.InputHandler.TapJumpEvent += TapJump;
-        stateMachine.InputHandler.JumpEvent+= Jump;
-        stateMachine.InputHandler.StartCrouchEvent += Crouch;
-        stateMachine.InputHandler.StopCrouchEvent += StopCrouch;
+        playerStats = stateMachine.PlayerStats;
+        playerBody = stateMachine.PlayerRigidbody;
+        EventEmitter = stateMachine.InputHandler;
+
+        EventEmitter.DiveDropEvent += DiveDrop;
+        EventEmitter.FlipEvent += Flip;
+        EventEmitter.TapJumpEvent += TapJump;
+        EventEmitter.JumpEvent+= Jump;
+        EventEmitter.StartCrouchEvent += Crouch;
+        EventEmitter.StopCrouchEvent += StopCrouch;
 
         Debug.Log("Entering default state");
     }
 
     public override void Tick(float deltaTime)
     {
-        Rotate(stateMachine.InputHandler.RotateValue, deltaTime);
+        Rotate(EventEmitter.RotateValue, deltaTime);
         MoveForward(deltaTime);
         CapVelocity();
     }
 
     public override void Exit()
     {
-        stateMachine.InputHandler.DiveDropEvent -= DiveDrop;
-        stateMachine.InputHandler.FlipEvent -= Flip;
-        stateMachine.InputHandler.TapJumpEvent -= TapJump;
-        stateMachine.InputHandler.JumpEvent -= Jump;
-        stateMachine.InputHandler.StartCrouchEvent -= Crouch;
-        stateMachine.InputHandler.StopCrouchEvent -= StopCrouch;
+        InputHandler EventEmitter = stateMachine.InputHandler;
+        EventEmitter.DiveDropEvent -= DiveDrop;
+        EventEmitter.FlipEvent -= Flip;
+        EventEmitter.TapJumpEvent -= TapJump;
+        EventEmitter.JumpEvent -= Jump;
+        EventEmitter.StartCrouchEvent -= Crouch;
+        EventEmitter.StopCrouchEvent -= StopCrouch;
         Debug.Log("Exiting default state");
     }
 
@@ -43,7 +49,7 @@ public class PlayerDefaultState : PlayerBaseState
         if (stateMachine.PowerControl.GetPower() > 0)
         {
             stateMachine.PowerControl.UsePower();
-            stateMachine.PlayerRigidbody.AddForce(-stateMachine.transform.up * stateMachine.diveSpeed * stateMachine.transform.localScale.y, ForceMode2D.Impulse);
+            playerBody.AddForce(-stateMachine.transform.up * playerStats.diveSpeed * stateMachine.transform.localScale.y, ForceMode2D.Impulse);
             stateMachine.SwitchState(new PlayerDiveState(stateMachine));
         }
         else
@@ -55,7 +61,7 @@ public class PlayerDefaultState : PlayerBaseState
     private void Rotate(Vector2 rotateInput, float deltaTime)
     {
 
-        stateMachine.PlayerRigidbody.AddTorque(-rotateInput.x * stateMachine.rotateSpeed * deltaTime);
+        playerBody.AddTorque(-rotateInput.x * playerStats.rotateSpeed * deltaTime);
         
         
     }
@@ -69,30 +75,31 @@ public class PlayerDefaultState : PlayerBaseState
 
     private void MoveForward(float deltaTime)
     {
-        stateMachine.PlayerRigidbody.velocity +=
+        playerBody.velocity +=
             new Vector2(stateMachine.transform.right.x,
-            stateMachine.transform.right.y) * stateMachine.rideSpeed *deltaTime;
+            stateMachine.transform.right.y) * playerStats.rideSpeed *deltaTime;
+        
 
     }
 
     private void CapVelocity()
     {
-        stateMachine.PlayerRigidbody.velocity = new Vector2(
-            Mathf.Min(Mathf.Abs(stateMachine.PlayerRigidbody.velocity.x), stateMachine.maxVelocity) * Mathf.Sign(stateMachine.PlayerRigidbody.velocity.x),
-            stateMachine.PlayerRigidbody.velocity.y);
+        playerBody.velocity = new Vector2(
+            Mathf.Min(Mathf.Abs(playerBody.velocity.x), playerStats.maxVelocity) * Mathf.Sign(playerBody.velocity.x),
+            playerBody.velocity.y);
     }
 
     private void TapJump ()
     {
-        if(stateMachine.PlayerRigidbody.IsTouchingLayers(LayerMask.GetMask("Ground")))
-        stateMachine.PlayerRigidbody.AddForce(new Vector2(0, stateMachine.tapJumpSpeed), ForceMode2D.Impulse);
+        if(playerBody.IsTouchingLayers(LayerMask.GetMask("Ground")))
+        playerBody.AddForce(new Vector2(0, playerStats.tapJumpSpeed), ForceMode2D.Impulse);
         
     }
 
     private void Jump()
     {
-        if (stateMachine.PlayerRigidbody.IsTouchingLayers(LayerMask.GetMask("Ground")))
-            stateMachine.PlayerRigidbody.AddForce(new Vector2(0, stateMachine.jumpSpeed), ForceMode2D.Impulse);
+        if (playerBody.IsTouchingLayers(LayerMask.GetMask("Ground")))
+            playerBody.AddForce(new Vector2(0, playerStats.jumpSpeed), ForceMode2D.Impulse);
         
     }
 

@@ -5,23 +5,23 @@ using UnityEngine.SceneManagement;
 
 public class RespawnControl : MonoBehaviour
 {
-    [field: SerializeField] public InputHandler InputHandler { get; private set; }
+    [field: SerializeField] public PlayerCollisionManager PlayerCollisionManager { get; private set; }
     [field: SerializeField] public CheckPointManager CheckPointManager { get; private set; }
 
 
     private void Awake()
-    {
-        if(CheckPointManager.GetActiveCheckpointPosition() != null)
-        gameObject.transform.position = CheckPointManager.GetActiveCheckpointPosition();
+    {        
+        if (CheckPointManager.GetActiveCheckpointPosition() != null)
+        PlayerCollisionManager.gameObject.transform.position = CheckPointManager.GetActiveCheckpointPosition();
     }
     void Start()
     {
-        InputHandler.CrashEvent += ResetToCheckpoint;
+        PlayerCollisionManager.CrashEvent += ResetToCheckpoint;
     }
 
     private void OnDestroy()
     {
-        InputHandler.CrashEvent -= ResetToCheckpoint;
+        PlayerCollisionManager.CrashEvent -= ResetToCheckpoint;
     }
 
     private void ResetToCheckpoint()

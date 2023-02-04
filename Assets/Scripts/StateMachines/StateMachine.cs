@@ -1,11 +1,10 @@
-using System.Collections;
-using System.Collections.Generic;
+using System;
 using UnityEngine;
 
 public abstract class StateMachine : MonoBehaviour
 {
 
-    public State currentState { get; private set; }
+    public State currentState { get ; private set; }
     // Start is called before the first frame update
     void Start()
     {
@@ -21,8 +20,12 @@ public abstract class StateMachine : MonoBehaviour
     public void SwitchState(State newState)
     {
         currentState?.Exit();
-        Debug.Log(newState.GetType());
         currentState = newState;
         currentState?.Enter();
+    }
+
+    public Type GetStateType()
+    {
+        return currentState.GetType();
     }
 }
